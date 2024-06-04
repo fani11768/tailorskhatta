@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailor Khatta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.4/xlsx.full.min.js"></script>
+    <style>
+      body{ background-color: #a4f882;}
+        /* Sidebar CSS */
+        #sidebar {
+            width: 250px;
+            height: 100%;
+            background-color: black;
+            color: #fff;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            
+    
+        }
+        #sidebar h2 {
+            margin-bottom: 20px;
+        }
+        #sidebar button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: white;
+            color: blue;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            height: 45px;
+        }
+        #sidebar button:hover {
+            background-color: #777;
+            color: white;
+        }
+
+        /* Form CSS */
+        form {
+            margin-top: 20px;
+            border: 1px solid blue;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: white;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="date"],
+        input[type="text"],
+        input[type="number"],
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button[type="button"] {
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button[type="button"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Delete Button CSS */
+        button.delete-button {
+            padding: 5px 10px;
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button.delete-button:hover {
+            background-color: #c82333;
+        }
+
+        /* Table CSS */
+        .fixed-header {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            z-index: 10;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+          
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 3px;
+            text-align: left;
+          
+        }
+        th {
+            background-color: black;
+            color: white;
+          
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+            
+        }
+        .section {
+            display: none;
+        }
+        .active {
+            display: block;
+            margin-left: 300px;
+        }
+        h2 { 
+            margin-left: 50px; 
+        }
+        #chart-container {
+            width: 80%;
+            margin: 50px auto;
+            background-color: rgb(122, 33, 48);
+            color: white;
+            font-size: larger;
+        }
+        #close-button {
+            display: none;
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #close-button:hover {
+            background-color: #0056b3;
+        }
+        /* Modal CSS */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+        }
+        .modal.show {
+            display: block;
+            
+        }
+        tfoot {
+            text-align: right;
+            background-color: black;
+            color: white;
+            font-size: larger;
+        }
+        
+        tfoot #total-price {
+            background-color: black;
+            color: white;
+          
+        }
+        /* CSS for the status column */
+
+        @media (max-width: 768px) {
+            #sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            #sidebar button {
+                display: inline-block;
+                width: auto;
+                margin: 5px;
+            }
+            .active {
+                margin-left: 0;
+            }
+            #chart-container {
+                width: 100%;
+                margin: 20px 0;
+            }
+            .table-container {
+                max-height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #sidebar {
+                font-size: 14px;
+            }
+            #sidebar button {
+                padding: 8px;
+                font-size: 14px;
+            }
+            form {
+                padding: 10px;
+            }
+            input[type="date"],
+            input[type="text"],
+            input[type="number"],
+            input[type="file"] {
+                padding: 6px;
+            }
+            button[type="button"] {
+                padding: 8px;
+                font-size: 14px;
+            }
+            button.delete-button {
+                padding: 4px 8px;
+                font-size: 14px;
+            }
+            th, td {
+                padding: 2px;
+                font-size: 12px;
+            }
+            tfoot {
+                font-size: 12px;
+            }
+            #close-button {
+                padding: 4px 8px;
+                font-size: 14px;
+            }
+            .modal {
+                width: 80%;
+                padding: 10px;
+            }
+        }
+/* CSS for the status column */
+.status-select {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.status-select.status-pending {
+    color: red;
+}
+
+.status-select.status-advance {
+    color: blue;
+}
+
+.status-select.status-successful {
+    color: green;
+}
+
+
+      
+    </style>
+</head>
+<body>
+    <div id="sidebar">
+        <h2>Tailor Khatta</h2>
+        <!-- Sidebar buttons -->
+        <button onclick="toggleSection('dashboard')">Dashboard</button>
+        <button onclick="toggleSection('add-record')">Add Record</button>
+        <button onclick="toggleSection('view-record')">View Records</button>
+        <button onclick="logout()">Logout</button> <!-- Logout button -->
+    </div>
+
+    <div id="main-content">
+        <div id="dashboard" class="section active">
+            <h1>Dashboard</h1>
+            <!-- Chart Container -->
+            <div id="chart-container">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+
+        <div id="add-record" class="section">
+            <h1>Add Record</h1>
+            <!-- Add Record form -->
+            <form id="add-record-form">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date"><br><br>
+                <label for="tailor-name">Tailor Name:</label>
+                <input type="text" id="tailor-name" name="tailor-name"><br><br>
+                <label for="per-shirt-price">Per Shirt Price:</label>
+                <input type="number" id="per-shirt-price" name="per-shirt-price"><br><br>
+                  <label for="status">Status (optional):</label>
+        <select id="status" name="status" class="status-select">
+            <option value="">Select Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Advance">Advance</option>
+            <option value="Successful">Successful</option>
+        </select><br><br>
+                <button style="width: 100%; background-color:#000000; color:white" type="button" onclick="addRecord()">Add Record</button>
+            </form>
+            <div id="modal" class="modal">
+                <p>Dear Admin Entry is recoded</p>
+                <button class="button" onclick="hideModal()">OK</button>
+            </div>
+        </div>
+
+        <div id="view-record" class="section">
+            <h1>View Records</h1>
+            <!-- Close Button -->
+            <button id="close-button" onclick="closeRecordSection()">Close</button>
+            <!-- Record table -->
+            <input type="text" id="search-input" onkeyup="searchRecord()" placeholder="Search by name..." class="fixed-header">
+            <div class="table-container">
+                <table id="records-table">
+                    <thead class="fixed-header">
+                        <tr>
+                            <th>Date</th>
+                            <th>Tailor Name</th>
+                            <th>Per Shirt Price</th>
+                            <th style="background-color: #000000;">Status</th>
+                            <th style="background-color: #c82333;">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Records will be displayed here -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="2">Total</td>
+                            <td id="total-price"></td>
+                            <td></td>
+                            <td
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <button style="background-color: black; width: 150px; height: 40px; color:white; border-color: black; margin-top:20px; cursor: pointer;" onclick="exportToExcel()">Export to Excel</button>
+        <button style="background-color: black; width: 150px; height: 40px; color:white; border-color: black; margin-top:20px; cursor: pointer;  " onclick="printTable()">Print</button>
+     
+        <!-- Modal -->
+      
+    
+        <script>
+            function showModal() {
+                const modal = document.getElementById('modal');
+                modal.classList.add('show');
+                setTimeout(() => {
+                    modal.classList.remove('show');
+                }, 1000);
+            }
+    
+            function hideModal() {
+                const modal = document.getElementById('modal');
+                modal.classList.remove('show');
+            }
+        </script>
+
+        <script>
+
+
+
+            
+            let records = [];
+
+            window.onload = function() {
+                if(localStorage.getItem('records')) {
+                    records = JSON.parse(localStorage.getItem('records'));
+                    displayRecords();
+                }
+                renderChart();
+            }
+            
+            function addRecord() {
+                let date = document.getElementById('date').value;
+                let tailorName = document.getElementById('tailor-name').value;
+                let perShirtPrice = document.getElementById('per-shirt-price').value;
+            
+                records.push({date, tailorName, perShirtPrice, status: 'Pending'});
+                localStorage.setItem('records', JSON.stringify(records));
+            
+                displayRecords();
+                calculateTotal();
+                renderChart();
+                showModal();
+
+                // Play sound
+                var audio = new Audio('ring.mp3'); // Provide the correct path to your sound file
+                audio.play();
+            }
+            
+            function displayRecords() {
+                let tableBody = document.querySelector('#records-table tbody');
+                tableBody.innerHTML = '';
+            
+                records.forEach((record, index) => {
+                    let statusClass = '';
+                    switch(record.status) {
+                        case 'Pending':
+                            statusClass = 'status-pending';
+                            break;
+                        case 'Advance':
+                            statusClass = 'status-advance';
+                            break;
+                        case 'Successful':
+                            statusClass = 'status-successful';
+                            break;
+                    }
+                    
+                    let row = `<tr>
+                                    <td>${record.date}</td>
+                                    <td>${record.tailorName}</td>
+                                    <td>${record.perShirtPrice}</td>
+                                    <td>
+                                        <select class="status-select ${statusClass}" onchange="changeStatus(${index}, this.value)">
+                                            <option value="Pending" ${record.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                            <option value="Advance" ${record.status === 'Advance' ? 'selected' : ''}>Advance</option>
+                                            <option value="Successful" ${record.status === 'Successful' ? 'selected' : ''}>Successful</option>
+                                        </select>
+                                    </td>
+                                    <td><button class="delete-button" onclick="deleteRecord(${index})">Delete</button></td>
+                                </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            
+                calculateTotal();
+            }
+            
+            function displayFilteredRecords(filteredRecords) {
+                let tableBody = document.querySelector('#records-table tbody');
+                tableBody.innerHTML = '';
+            
+                filteredRecords.forEach((record, index) => {
+                    let statusClass = '';
+                    switch(record.status) {
+                        case 'Pending':
+                            statusClass = 'status-pending';
+                            break;
+                        case 'Advance':
+                            statusClass = 'status-advance';
+                            break;
+                        case 'Successful':
+                            statusClass = 'status-successful';
+                            break;
+                    }
+                    
+                    let row = `<tr>
+                                    <td>${record.date}</td>
+                                    <td>${record.tailorName}</td>
+                                    <td>${record.perShirtPrice}</td>
+                                    <td>
+                                        <select class="status-select ${statusClass}" onchange="changeStatus(${index}, this.value)">
+                                            <option value="Pending" ${record.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                            <option value="Advance" ${record.status === 'Advance' ? 'selected' : ''}>Advance</option>
+                                            <option value="Successful" ${record.status === 'Successful' ? 'selected' : ''}>Successful</option>
+                                        </select>
+                                    </td>
+                                    <td><button class="delete-button" onclick="deleteRecord(${index})">Delete</button></td>
+                                </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            
+                calculateTotal(filteredRecords);
+            
+            
+            
+                calculateTotal();
+            }
+            
+            function deleteRecord(index) {
+                records.splice(index, 1);
+                localStorage.setItem('records', JSON.stringify(records));
+            
+                displayRecords();
+                renderChart();
+            }
+            
+            function changeStatus(index, status) {
+                records[index].status = status;
+                localStorage.setItem('records', JSON.stringify(records));
+            
+                displayRecords();
+                calculateTotal();
+            }
+            
+            function searchRecord() {
+                let searchInput = document.getElementById('search-input').value.toLowerCase();
+                let filteredRecords = records.filter(record => record.tailorName.toLowerCase().includes(searchInput));
+                displayFilteredRecords(filteredRecords);
+            }
+            
+            function displayFilteredRecords(filteredRecords) {
+                let tableBody = document.querySelector('#records-table tbody');
+                tableBody.innerHTML = '';
+            
+                filteredRecords.forEach((record, index) => {
+                    let row = `<tr>
+                                    <td>${record.date}</td>
+                                    <td>${record.tailorName}</td>
+                                    <td>${record.perShirtPrice}</td>
+                                    <td>
+                                        <select  onchange="changeStatus(${index}, this.value)">
+                                            <option style="color-red;" value="Pending" ${record.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                            <option value="Advance" ${record.status === 'Advance' ? 'selected' : ''}>Advance</option>
+                                            <option value="Successful" ${record.status === 'Successful' ? 'selected' : ''}>Successful</option>
+                                        </select>
+                                    </td>
+                                    <td><button class="delete-button" onclick="deleteRecord(${index})">Delete</button></td>
+                                </tr>`;
+                    tableBody.innerHTML += row;
+                });
+            
+                calculateTotal(filteredRecords);
+            }
+            
+            function calculateTotal(filteredRecords = null) {
+                let recordsToCalculate = filteredRecords || records;
+                let total = recordsToCalculate.reduce((acc, record) => {
+                    if (record.status !== 'Advance' && record.status !== 'Successful') {
+                        return acc + parseInt(record.perShirtPrice);
+                    }
+                    return acc;
+                }, 0);
+                document.getElementById('total-price').innerText = total;
+            }
+            
+            function toggleSection(sectionId) {
+                let sections = document.getElementsByClassName('section');
+                for (let i = 0; i < sections.length; i++) {
+                    sections[i].classList.remove('active');
+                }
+                document.getElementById(sectionId).classList.add('active');
+                if(sectionId === 'view-record') {
+                    displayRecords();
+                    calculateTotal();
+                }
+            }
+            
+            function renderChart() {
+                let tailorNames = [...new Set(records.map(record => record.tailorName))];
+                let data = tailorNames.map(name => {
+                    return records.filter(record => record.tailorName === name && (record.status !== 'Advance' && record.status !== 'Successful'))
+                        .reduce((acc, record) => acc + parseInt(record.perShirtPrice), 0);
+                });
+            
+                new Chart("myChart", {
+                    type: "bar",
+                    data: {
+                        labels: tailorNames,
+                        datasets: [{
+                            backgroundColor: "rgba(0,123,255,0.5)",
+                            borderColor: "rgb(249, 246, 238)",
+                            borderWidth: 1,
+                            data: data
+                        }]
+                    },
+                    options: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: "Total Earnings per Tailor"
+                        },
+                        onClick: function(evt, item) {
+                            if(item.length > 0) {
+                                let index = item[0]._index;
+                                let tailorName = tailorNames[index];
+                                searchRecord(tailorName);
+                                toggleSection('view-record');
+                                document.getElementById('close-button').style.display = 'block';
+                            }
+                        }
+                    }
+                });
+            }
+            
+            function closeRecordSection() {
+                document.getElementById('close-button').style.display = 'none';
+                toggleSection('dashboard');
+            }
+            
+            function exportToExcel() {
+            
+                let wb = XLSX.utils.book_new();
+                    let ws = XLSX.utils.json_to_sheet(records);
+                    XLSX.utils.book_append_sheet(wb, ws, "Records");
+                    XLSX.writeFile(wb, 'records.xlsx');
+                }
+                
+                function printTable() {
+                    let printContent = document.querySelector('.table-container').innerHTML;
+                    let originalContent = document.body.innerHTML;
+                    document.body.innerHTML = printContent;
+                    window.print();
+                    document.body.innerHTML = originalContent;
+                    window.location.reload();
+                }
+                function showModal() {
+                    document.getElementById('modal').classList.add('show');
+                }
+        
+                function hideModal() {
+                    document.getElementById('modal').classList.remove('show');
+                }
+        
+                function logout() {
+                    localStorage.removeItem('isLoggedIn');
+                    window.location.href = 'index.html';
+                }
+            </script>
+        </div>
+    </div>
+</body>
+</html>
