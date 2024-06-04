@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailor Khatta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: aqua;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url(https://c0.wallpaperflare.com/preview/573/705/208/thread-yellow-cotton-color.jpg);
+         background-repeat: no-repeat; background-size: cover;}
+        .login-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+        }
+        .login-container h1 {
+            margin-bottom: 20px;
+        }
+        .login-container label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .login-container input[type="text"],
+        .login-container input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 1px solid blue;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .login-container button {
+            padding: 10px;
+            background-color: rgb(0, 0, 0);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            border: blue;
+            width: 100%;
+        }
+        .login-container button:hover {
+            background-color: crimson;
+        }
+        .error {
+            color: red;
+            margin-bottom: 20px;
+        }
+
+        /* Media Queries */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .login-container {
+                padding: 15px;
+            }
+            .login-container h1 {
+                font-size: 24px;
+            }
+            .login-container input[type="text"],
+            .login-container input[type="password"] {
+                padding: 10px;
+            }
+            .login-container button {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Tailor Khatta Admin Login</h1>
+        <div class="error" id="error-message"></div>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <button type="button" onclick="login()">Login </button>
+    </div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Dummy credentials
+            const validUsername = 'fani';
+            const validPassword = 'admin999';
+
+            if (username === validUsername && password === validPassword) {
+                localStorage.setItem('isLoggedIn', true);
+                window.location.href = 'main.html'; // Redirect to your main page
+            } else {
+                document.getElementById('error-message').innerText = 'Invalid username or password are you admin?' ;
+            }
+        }
+    </script>
+</body>
+</html>
